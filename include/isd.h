@@ -37,27 +37,35 @@ consteval bool implements(std::meta::info objInfo, std::meta::info interfaceInfo
         }
     }
 
-    bool implements{ true };
+    std::vector<info> interfaceFunctions;
     for(auto m : interfaceMembers) {
-        // only match require functions for now
-        if(!is_function(m) || !is_pure_virtual(m)) continue;
+        // only pure virtual functions allowed 
+        if(is_function(m) && is_pure_virtual(m)) {
+            interfaceFunctions.push_back(m);
+        }
+    }
 
+    // throw if interface has no functions to implement 
+    // (likely a misuse of access level definition in the interface)
+    if(interfaceFunctions.size() == 0) {
+        throw "ISD - Interface does not define any accessible pure virtual functions";
+    }
+
+    bool implements{ true };
+    for(auto m : interfaceFunctions) {
         // obj must have function with same signature
         bool found{ false };
 
         for(auto funcInfo : objFunctions) {
             // must be implemented only once
             if(same_signature(funcInfo, m)) {
-                if(found) {
-                    implements = false;
-                } else {
-                    found = true;
-                }
+                found = true;
             }
         }
 
         if(!found) {
             implements = false;
+            break;
         }
     }
 
