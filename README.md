@@ -6,11 +6,10 @@ pattern for compile time polymorphism by specifying a concept that accepts a typ
 This could be a better option than CRTP and handwritten concepts due to its conciseness and stricter function matching
 
 ## The improvements of this pattern over its predecessors:
+- Easier to use and defined only once (with a regular C++ interface)
 - Great diagnostics potential due to use of reflection
-- defined only once
-- easier to use (defined by a regular interface)
-- usable with runtime dispatch cases through one interface
-- stricter interface check than handwritten concepts (good or bad depending on use case)
+- Usable with runtime dispatch cases through one interface
+- Stricter interface check than handwritten concepts (good or bad depending on use case)
 
 Simply put this pattern is defined by reflecting the type of an interface, extracting its pure virtual functions,
 and ensuring the type in question implements these functions, having the same exact name as it is in the code, and 
@@ -24,13 +23,17 @@ struct IAnimal {
 
 template<typename T>
 concept AnimalLike = isd::implements(^^T, ^^IAnimal);
+
+template <AnimalLike T>
+void feed(T& a) { a.Eat(); }   // direct call, no vtable
 ```
+
 `implements(std::meta::info objInfo, std::meta::info interfaceInfo)` here is a predicate that returns true if the first operand defines all the interface's pure virtual functions with the same function name and type. I have included a header with the implementation `include/isd.h`
 
 I believe this pattern makes compile time polymorphism in C++ a whole lot easier to use in certain use cases.
 
 
-It is important to note that "satisfying" an interface in this context isn't the same as how the C++ abi defines overriding a function. In this pattern a function of an interface `A` is considered satisfied by an implementing function `B` if   `is_same_type(type_of(^^A), type_of(^^B)) && identifier_of(^^A) == identifier_of(^^B)` under the `std::meta` namespace
+It is important to note that "satisfying" an interface in this context isn't the same as how the C++ standard defines overriding a function. In this pattern a function of an interface `A` is considered satisfied by an implementing function `B` if   `is_same_type(type_of(^^A), type_of(^^B)) && identifier_of(^^A) == identifier_of(^^B)` under the `std::meta` namespace
 
 
 (note that only accessible pure virtual functions are considered for matching)
