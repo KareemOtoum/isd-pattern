@@ -110,7 +110,7 @@ All of these patterns however benefit from inherited functions being able to sat
 ## Where this pattern can be improved (and weaknesses)
 
 - Diagnostic messages detailing missing functions
-- No support for subsuming (for e.g. Interfaces implementing and extending `IAnimal` will not be prefered over the base interface in a context expecting `IAnimal`) there are some things that can be implemented here like allowing inherited pure virtual functions from other interfaces to be required by the interface 
+- No support for subsuming (for e.g. Interfaces implementing and extending `IAnimal` will not be prefered over the base interface in a context expecting `IAnimal`) there are some things that I think can be implemented here like allowing inherited pure virtual functions from other interfaces to be required by the interface by including those functions to our reflection processing (though I have not yet looked into this)
 - This pattern isnt necessarily better than handwritten concepts or CRTP, they are less strict and that can be useful depending on the use case
 - Default implementations of functions in the interface cannot be provided
 
